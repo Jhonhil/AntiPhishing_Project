@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard - SafeGuard</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body class="bg-light">
+    <div class="container mt-5">
+        <div class="d-flex justify-content-between mb-4">
+            <h2>Dashboard Admin Edukasi</h2>
+            <a href="/" class="btn btn-outline-secondary">Lihat Website</a>
+        </div>
+
+        <div class="card p-4 shadow-sm mb-5">
+            <h5>Tambah Materi Edukasi Baru</h5>
+            <form action="/admin" method="post">
+                <div class="mb-3">
+                    <input type="text" name="judul" class="form-control" placeholder="Judul Artikel" required>
+                </div>
+                <div class="mb-3">
+                    <select name="kategori" class="form-select">
+                        <option value="Umum">Umum</option>
+                        <option value="WhatsApp">WhatsApp</option>
+                        <option value="E-Banking">E-Banking</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <textarea name="konten" class="form-control" rows="3" placeholder="Isi materi edukasi..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-success">Simpan Materi</button>
+            </form>
+        </div>
+
+        <table class="table table-white table-hover shadow-sm">
+            <thead class="table-dark">
+                <tr>
+                    <th>Judul</th>
+                    <th>Kategori</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in edukasi %}
+                <tr>
+                    <td>{{ item.judul }}</td>
+                    <td>{{ item.kategori }}</td>
+                    <td>
+                        <a href="/delete/{{ item.id }}" class="btn btn-danger btn-sm" onclick="return confirm('Hapus materi ini?')">Hapus</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

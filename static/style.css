@@ -1,0 +1,68 @@
+/* Custom Style Konsisten dengan Hero Section (Biru Utama) */
+
+:root {
+    --primary-blue: #0d6efd;
+    --dark-blue: #003d99;
+}
+
+body {
+    background-color: #f8f9fa; /* Abu-abu sangat muda agar kartu putih terlihat jelas */
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Mengubah warna badge kategori agar sama dengan Hero Section */
+.badge.bg-info, .badge.bg-primary {
+    background-color: var(--dark-blue) !important;
+    padding: 8px 12px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+/* Mengubah warna tombol agar konsisten */
+.btn-primary {
+    background-color: var(--primary-blue);
+    border-color: var(--primary-blue);
+}
+
+.btn-primary:hover {
+    background-color: var(--dark-blue);
+    border-color: var(--dark-blue);
+}
+
+.btn-outline-primary {
+    color: var(--primary-blue);
+    border-color: var(--primary-blue);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--primary-blue);
+    color: white;
+}
+
+/* Styling kartu agar lebih modern */
+.card {
+    border: none;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+/* Efek kartu edukasi agar selaras dengan tema profesional */
+.card-edukasi:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 30px rgba(0, 61, 153, 0.1) !important;
+}
+
+/* Link pembersihan (agar tidak ada garis bawah) */
+a {
+    text-decoration: none;
+}
+
+/* Animasi sederhana untuk transisi halaman */
+.container {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
