@@ -1,104 +1,133 @@
 <!doctype html>
-<html lang="en">
+<html lang="id">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Anti-Phishing URL Checker</title>
-    <style>
-      body {
-        font-family: sans-serif;
-        display: flex;
-        justify-content: center;
-        padding-top: 50px;
-        background-color: #f4f4f9;
-      }
-      .container {
-        background: white;
-        padding: 2rem;
-        border-radius: 8px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        width: 100%;
-        max-width: 500px;
-      }
-      h1 {
-        text-align: center;
-        color: #333;
-      }
-      form {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 20px;
-      }
-      input {
-        flex: 1;
-        padding: 10px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-      }
-      button {
-        padding: 10px 20px;
-        background: #007bff;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-      }
-      button:hover {
-        background: #0056b3;
-      }
-      .result {
-        padding: 15px;
-        border-radius: 4px;
-        margin-top: 20px;
-      }
-      .danger {
-        background: #ffebee;
-        color: #c62828;
-        border: 1px solid #ef9a9a;
-      }
-      .safe {
-        background: #e8f5e9;
-        color: #2e7d32;
-        border: 1px solid #a5d6a7;
-      }
-      .error {
-        background: #fff3e0;
-        color: #ef6c00;
-        border: 1px solid #ffe0b2;
-      }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
   </head>
   <body>
     <div class="container">
-      <h1>URL Checker</h1>
-      <form method="POST">
-        <input
-          type="text"
-          name="url"
-          placeholder="Masukkan URL (contoh: google.com)"
-          value="{{ url }}"
-          required
-        />
-        <button type="submit">Cek</button>
-      </form>
-
-      {% if result %} {% set stats = result.get('data', {}).get('attributes',
-      {}).get('last_analysis_stats', {}) %} {% set malicious =
-      stats.get('malicious', 0) %} {% set suspicious = stats.get('suspicious',
-      0) %}
-
-      <div class="result {{ 'danger' if malicious > 0 else 'safe' }}">
-        <strong>Hasil untuk:</strong> {{ url }}<br />
-        Malicious: {{ malicious }}<br />
-        Suspicious: {{ suspicious }}<br />
-        <strong>Kesimpulan:</strong> {{ 'URL ini terdeteksi berbahaya!' if
-        malicious > 0 else 'URL terlihat aman.' }}
+      <div class="header-nav">
+        <h1 style="margin: 0">🛡️ Anti-Phishing URL Checker</h1>
+        <a href="{{ url_for('admin') }}">Log Riwayat ➔</a>
       </div>
-      {% elif url %}
-      <div class="result error">
-        Gagal mendapatkan hasil analisis untuk {{ url }}.
+
+      <div class="card">
+        <h2>Periksa Keamanan Tautan</h2>
+        <p class="subtitle">
+          Masukkan URL yang ingin dianalisis. Sistem akan memeriksa struktur,
+          reputasi, dan pola phishing secara otomatis.
+        </p>
+
+        <form method="POST" id="scan-form" class="scan-form">
+          <div class="input-group">
+            <div style="flex: 1; position: relative;">
+              <input
+                type="text"
+                name="url"
+                id="url-input"
+                placeholder="https://contoh.com/halaman-login"
+                autocomplete="off"
+                spellcheck="false"
+                required
+              />
+              <span id="validation-indicator" class="validation-indicator"></span>
+            </div>
+            <button type="submit" id="submit-btn" class="btn btn-primary" disabled>
+              🔍 Periksa
+            </button>
+          </div>
+          <div id="validation-msg" class="validation-msg"></div>
+        </form>
       </div>
-      {% endif %}
+
+      <div class="card" style="text-align: center; padding: 20px 32px;">
+        <p style="color: var(--text-muted); font-size: 14px; margin: 0;">
+          Sistem ini menggunakan kombinasi <strong>heuristik aturan</strong> dan
+          <strong>model Random Forest</strong> (Machine Learning) untuk mendeteksi
+          phishing.<br />
+          Didukung oleh 14 indikator fitur URL &amp; database log audit SQLite.
+        </p>
+      </div>
     </div>
+
+    <script>
+      (function () {
+        var input = document.getElementById("url-input");
+        var indicator = document.getElementById("validation-indicator");
+        var msg = document.getElementById("validation-msg");
+        var btn = document.getElementById("submit-btn");
+
+        function validate() {
+          var val = input.value.trim();
+
+          if (val === "") {
+            indicator.textContent = "";
+            indicator.className = "validation-indicator";
+            msg.textContent = "";
+            msg.className = "validation-msg";
+            input.classList.remove("input-valid", "input-invalid");
+            btn.disabled = true;
+            return;
+          }
+
+          if (/\s/.test(val)) {
+            indicator.textContent = "✗";
+            indicator.className = "validation-indicator invalid";
+            msg.textContent = "URL tidak boleh mengandung spasi";
+            msg.className = "validation-msg invalid";
+            input.classList.remove("input-valid");
+            input.classList.add("input-invalid");
+            btn.disabled = true;
+            return;
+          }
+
+          // Tambahkan http:// jika tidak ada protokol
+          var testVal = val;
+          if (
+            !testVal.startsWith("http://") &&
+            !testVal.startsWith("https://")
+          ) {
+            testVal = "http://" + testVal;
+          }
+
+          try {
+            var parsed = new URL(testVal);
+            var host = parsed.hostname;
+
+            if (!host || !host.includes(".")) {
+              throw new Error("no dot");
+            }
+
+            indicator.textContent = "✓";
+            indicator.className = "validation-indicator valid";
+            msg.textContent = "Format URL valid";
+            msg.className = "validation-msg valid";
+            input.classList.remove("input-invalid");
+            input.classList.add("input-valid");
+            btn.disabled = false;
+          } catch (e) {
+            indicator.textContent = "✗";
+            indicator.className = "validation-indicator invalid";
+
+            if (!val.includes(".")) {
+              msg.textContent = "URL harus mengandung nama domain (minimal satu titik)";
+            } else {
+              msg.textContent = "Format URL tidak valid";
+            }
+            msg.className = "validation-msg invalid";
+            input.classList.remove("input-valid");
+            input.classList.add("input-invalid");
+            btn.disabled = true;
+          }
+        }
+
+        input.addEventListener("input", validate);
+        input.addEventListener("paste", function () {
+          setTimeout(validate, 50);
+        });
+      })();
+    </script>
   </body>
 </html>

@@ -1,0 +1,7 @@
+Flask
+requests
+urllib3
+scikit-learn
+numpy
+joblib
+python-whois
